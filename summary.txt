@@ -1,0 +1,18 @@
+-> In your app (backend pod)
+You use something like prom-client (Node.js) to create and expose metrics.
+Typically you just res.send(await register.metrics()) on /metrics.
+At this point, your backend pod is serving metrics on /metrics, but only inside the pod. Nothing is scraping it yet.
+
+-> How Prometheus gets those metrics
+Prometheus never “pushes” metrics, it only scrapes them.
+In Kubernetes, scraping works via service discovery + scrape configs.
+Without Kubernetes: You would manually add in prometheus.yml something like:
+scrape_configs:
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['backend:4000']
+
+
+-> With Kubernetes: You usually don’t do static configs because pods change.
+Instead, you use Kubernetes service discovery. Prometheus discovers pods/services/endpoints dynamically using labels/annotations.
+
