@@ -1,20 +1,20 @@
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+apiVersion: monitoring.coreos.com/v1    # CRD group/version provided by Prometheus Operator
+kind: ServiceMonitor                   # Type: tells the Operator "this defines how to scrape services"
 metadata:
   labels:
-    app: a-service-service-monitor
+    app: a-service-service-monitor     # labels applied to the ServiceMonitor object itself
     release: monitoring
-  name: a-service-service-monitor
-  namespace: monitoring
+  name: a-service-service-monitor      # name of this ServiceMonitor resource
+  namespace: monitoring                # namespace where this ServiceMonitor lives (NOT the namespace of the target service)
 spec:
-  jobLabel: job
+  jobLabel: job                         # (optional) use the Service's label key "job" as the Prometheus job label
   endpoints:
-    - interval: 2s
-      port: a-service-port
-      path: /metrics
+    - interval: 2s                      # scrape interval for this endpoint (very frequent - see note)
+      port: a-service-port              # the named port on the Service (or Pod targetPort) to scrape
+      path: /metrics                    # HTTP path to scrape for Prometheus metrics
   selector:
     matchLabels:
-      app: a-service
+      app: a-service                    # select Services (in target namespaces) that have this label
   namespaceSelector:
     matchNames:
-      - dev
+      - dev                             # which namespaces to look for Services in (here: "dev")
